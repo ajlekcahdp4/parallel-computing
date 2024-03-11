@@ -5,20 +5,19 @@
 //   and you think this stuff is worth it, you can buy me a beer in return.
 // ----------------------------------------------------------------------------
 
-#include <stdio.h>
 #include <mpi.h>
+#include <stdio.h>
 
-int main (int Argc, char* Argv[])
-{
+int main(int Argc, char *Argv[]) {
   int ErrCode = MPI_Init(&Argc, &Argv);
   if (ErrCode != 0) {
-		fprintf(stderr, "Error: Failed to initialize MPI!");
+    fprintf(stderr, "Error: Failed to initialize MPI!");
     return ErrCode;
-	}
+  }
   int Rank, Size;
-	MPI_Comm_size(MPI_COMM_WORLD, &Size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &Rank);  
-	printf("Hello, World! Size: %d, Rank: %d\n", Size, Rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &Size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
+  printf("Hello, World! Size: %d, Rank: %d\n", Size, Rank);
   MPI_Finalize();
   return 0;
 }
