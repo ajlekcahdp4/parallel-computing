@@ -2,7 +2,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    lint-nix.url = "github:xc-jp/lint.nix";
   };
 
   outputs = {
@@ -17,30 +16,30 @@
       pkgs = import nixpkgs {inherit system;};
 
       clang-tools = pkgs.clang-tools_17;
-      lints = (import ./nix/lints.nix {inherit inputs;}) pkgs ./.;
       nativeBuildInputs = with pkgs; [
         clang-tools
-        act
-        just
-        mpi
         automake
         autoconf
-        addlicense
         gdb
+        cmake
         gnuplot
-        bc
+        pkg-config
+      ];
+      buildInputs = with pkgs; [
+        (boost.override { useMpi = true; })
+        mpi
+        fmt
       ];
 
       shell =
         (pkgs.mkShell.override {
-          stdenv = pkgs.gcc49Stdenv;
+          stdenv = pkgs.llvmPackages_17.stdenv;
         }) {
-          inherit nativeBuildInputs;
+          inherit nativeBuildInputs buildInputs;
         };
     in {
       devShells = {
         default = shell;
-        devGcc = shell;
       };
     });
 }
