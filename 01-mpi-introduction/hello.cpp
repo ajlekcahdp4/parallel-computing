@@ -5,19 +5,13 @@
 //   and you think this stuff is worth it, you can buy me a beer in return.
 // ----------------------------------------------------------------------------
 
-#include <mpi.h>
-#include <stdio.h>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
+#include <fmt/core.h>
 
-int main(int Argc, char *Argv[]) {
-  int ErrCode = MPI_Init(&Argc, &Argv);
-  if (ErrCode != 0) {
-    fprintf(stderr, "Error: Failed to initialize MPI!");
-    return ErrCode;
-  }
-  int Rank, Size;
-  MPI_Comm_size(MPI_COMM_WORLD, &Size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
-  printf("Hello, World! Size: %d, Rank: %d\n", Size, Rank);
-  MPI_Finalize();
-  return 0;
+namespace mpi = boost::mpi;
+int main(int argc, char **argv) {
+  mpi::environment env(argc, argv);
+  mpi::communicator world;
+  fmt::print("Hello, World! Size: {}, Rank: {}\n", world.size(), world.rank());
 }
