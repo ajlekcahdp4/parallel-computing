@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -18,8 +18,6 @@
       clang-tools = pkgs.clang-tools_17;
       nativeBuildInputs = with pkgs; [
         clang-tools
-        automake
-        autoconf
         gdb
         cmake
         gnuplot
