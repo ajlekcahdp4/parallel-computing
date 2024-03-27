@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(mpi-introduction)
+project(mpi-merge-sort)
 
 option(INSOURCEBUILD OFF) # Prevent in-source style builds
 if((${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR}) AND NOT
@@ -33,11 +33,12 @@ function(add_exec TARGET_NAME SOURCE)
   target_enable_linter(${TARGET_NAME})
   target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
   enable_warnings(${TARGET_NAME})
-	target_link_libraries(${TARGET_NAME} MPI::MPI_CXX Boost::mpi Boost::program_options fmt::fmt)
+	target_link_libraries(${TARGET_NAME} MPI::MPI_CXX Boost::mpi Boost::program_options fmt::fmt range-v3)
 endfunction()
 
 find_package(Boost REQUIRED COMPONENTS mpi program_options)
 find_package(MPI REQUIRED)
 find_package(fmt REQUIRED)
+find_package(range-v3 REQUIRED)
 
 add_exec(sort sort.cpp)

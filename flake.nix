@@ -27,6 +27,7 @@
         (boost.override { useMpi = true; })
         mpi
         fmt
+        range-v3
       ];
 
       shell =
