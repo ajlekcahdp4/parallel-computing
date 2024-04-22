@@ -28,7 +28,6 @@ function(enable_warnings TARGET_NAME)
               -Wpedantic
               -Wmisleading-indentation
               -Wnull-dereference
-              -Wformat=2
               -Wimplicit-fallthrough
               -Wno-missing-field-initializers
               -Wno-nullability-extension)
