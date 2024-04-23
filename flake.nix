@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -14,25 +14,24 @@
   in
     flake-utils.lib.eachSystem systems (system: let
       pkgs = import nixpkgs {inherit system;};
-
-      clang-tools = pkgs.clang-tools_17;
+      llvmStdenv = pkgs.llvmPackages_18.libcxxStdenv;
       nativeBuildInputs = with pkgs; [
-        clang-tools
+        clang-tools_18
         gdb
         cmake
         gnuplot
         pkg-config
       ];
       buildInputs = with pkgs; [
-        (boost.override { useMpi = true; })
+        (boost.override { useMpi = true; stdenv = llvmStdenv; })
         mpi
-        fmt
+        (fmt.override {stdenv = llvmStdenv;})
         range-v3
       ];
 
       shell =
         (pkgs.mkShell.override {
-          stdenv = pkgs.llvmPackages_17.stdenv;
+          stdenv = llvmStdenv;
         }) {
           inherit nativeBuildInputs buildInputs;
         };
