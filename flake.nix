@@ -20,6 +20,7 @@
         gdb
         cmake
         gnuplot
+        valgrind
         pkg-config
       ];
       buildInputs = with pkgs; [
