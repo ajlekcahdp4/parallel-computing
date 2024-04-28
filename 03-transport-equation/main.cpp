@@ -60,38 +60,39 @@ template <typename T> auto get_initial() -> std::vector<T> {
 template <typename T>
 std::vector<T> solve_parallel(right_major_mdspan<T> matrix,
                               const mpi::communicator &world) {
-  auto rank = world.rank();
-  auto world_size = world.size();
-
-  if (rank == root_communicator_rank) {
-    auto dst = (rank+1)%world_size;
-    world.send(dst, 0, dst);
-  }
-  if (rank == world_size - 1) {
-    assert(rank);
-    auto src = rank - 1;
-    world.recv(src, 0, src);
-  }
-  for (unsigned t = rank; t < matrix.extent(1); t += world_size) {
-    for (unsigned x = 1; x < matrix.extent(0); ++x) {
-      if (rank != root_communicator_rank) {
-        auto src = rank ? rank - 1 : world_size - 1;
-        fmt::println("RECV: rank {} from {} to {} tag = {} t = {}, x = {}", rank, src, rank , x, t, x);
-        world.recv(src, /* tag */ 0, matrix[x, t - 1]);
-        matrix[x, t] = matrix[x, t - 1] -
-                       (tau / h) * (matrix[x, t - 1] - matrix[x - 1, t - 1]) +
-                       tau * f(x * h, (t - 1) * tau);
-      }
-      if (rank != world_size - 1) {
-        auto dst = (rank + 1) % world_size;
-        fmt::println("SEND: rank {} from {} to {} tag = {} t = {}, x = {}", rank, rank, dst, x, t, x);
-        world.send(dst, /* tag */ 0, matrix[x, t]);
-      }
-    }
-  }
-  world.barrier();
+//  auto rank = world.rank();
+//  auto world_size = world.size();
+//
+//  if (rank == root_communicator_rank) {
+//    auto dst = (rank+1)%world_size;
+//    world.send(dst, 0, dst);
+//  }
+//  if (rank == world_size - 1) {
+//    assert(rank);
+//    auto src = rank - 1;
+//    world.recv(src, 0, src);
+//  }
+//  for (unsigned t = rank; t < matrix.extent(1); t += world_size) {
+//    for (unsigned x = 1; x < matrix.extent(0); ++x) {
+//      if (rank != root_communicator_rank) {
+//        auto src = rank ? rank - 1 : world_size - 1;
+//        fmt::println("RECV: rank {} from {} to {} tag = {} t = {}, x = {}", rank, src, rank , x, t, x);
+//        world.recv(src, /* tag */ 0, matrix[x, t - 1]);
+//        matrix[x, t] = matrix[x, t - 1] -
+//                       (tau / h) * (matrix[x, t - 1] - matrix[x - 1, t - 1]) +
+//                       tau * f(x * h, (t - 1) * tau);
+//      }
+//      if (rank != world_size - 1) {
+//        auto dst = (rank + 1) % world_size;
+//        fmt::println("SEND: rank {} from {} to {} tag = {} t = {}, x = {}", rank, rank, dst, x, t, x);
+//        world.send(dst, /* tag */ 0, matrix[x, t]);
+//      }
+//    }
+//  }
+//  world.barrier();
 }
 
+void foo (right_major_mdspan<double> matrix, const mpi::communicator &world) {}
 template<std::floating_point T>
 void print_matrix(std::span<T> data, unsigned dim1, unsigned dim2) {
   fmt::println ("---");
@@ -111,7 +112,8 @@ auto main(int argc, char **argv) -> int {
   auto initial_conditions = get_initial<double>();
   if (world.rank() == root_communicator_rank)
     print_matrix(std::span(initial_conditions), dim_x, dim_t);
-  solve_parallel<double>(right_major_mdspan<double>(initial_conditions.data()), world);
+//  solve_parallel<double>(right_major_mdspan<double>(initial_conditions.data()), world);
+  foo(right_major_mdspan<double>(initial_conditions.data()), world);
   if (world.rank() == root_communicator_rank)
     print_matrix(std::span(initial_conditions), dim_x, dim_t);
 
