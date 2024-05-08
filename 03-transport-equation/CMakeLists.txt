@@ -28,16 +28,22 @@ endif()
 
 include(../cmake/functions.cmake)
 
+find_package(Boost REQUIRED COMPONENTS mpi program_options)
+find_package(MPI REQUIRED)
+find_package(fmt REQUIRED)
+
+add_library(solver transport_solver.cpp)
+target_enable_linter(solver)
+target_compile_features(solver PUBLIC cxx_std_23)
+enable_warnings(solver)
+target_link_libraries(solver fmt::fmt Boost::mpi MPI::MPI_CXX)
+
 function(add_exec TARGET_NAME SOURCE)
   add_executable(${TARGET_NAME} ${SOURCE})
   target_enable_linter(${TARGET_NAME})
   target_compile_features(${TARGET_NAME} PUBLIC cxx_std_23)
   enable_warnings(${TARGET_NAME})
-	target_link_libraries(${TARGET_NAME} MPI::MPI_CXX Boost::mpi Boost::program_options fmt::fmt)
+	target_link_libraries(${TARGET_NAME} solver MPI::MPI_CXX Boost::mpi Boost::program_options fmt::fmt)
 endfunction()
-
-find_package(Boost REQUIRED COMPONENTS mpi program_options)
-find_package(MPI REQUIRED)
-find_package(fmt REQUIRED)
 
 add_exec(solution main.cpp)
