@@ -19,13 +19,11 @@
 namespace mpi = boost::mpi;
 namespace {
 
-static constexpr unsigned isize = 1000;
-static constexpr unsigned jsize = 1000;
-
 using extents_t = std::dextents<std::size_t, 2>;
 using mdspan = std::mdspan<double, extents_t, std::layout_right>;
 
-double do_parallel(mdspan matrix, mpi::communicator &world) {
+double do_parallel(mdspan matrix, mpi::communicator &world, unsigned isize,
+                   unsigned jsize) {
   auto size = world.size();
   auto rank = world.rank();
   auto jstep = jsize / size;
@@ -85,7 +83,7 @@ double do_parallel(mdspan matrix, mpi::communicator &world) {
   return timer.elapsed();
 }
 
-double do_sequential(mdspan matrix) {
+double do_sequential(mdspan matrix, unsigned isize, unsigned jsize) {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
@@ -112,7 +110,11 @@ auto main(int argc, const char **argv) -> int {
 
   po::options_description desc("Allowed options");
   bool parallel = false;
+  unsigned isize = 1000;
+  unsigned jsize = 1000;
   desc.add_options()("parallel", po::value(&parallel), "Use MPI");
+  desc.add_options()("isize", po::value(&isize), "ISIZE");
+  desc.add_options()("jsize", po::value(&jsize), "JSIZE");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -120,15 +122,15 @@ auto main(int argc, const char **argv) -> int {
     std::cout << desc << "\n";
     return EXIT_SUCCESS;
   }
-  std::array<double, isize * jsize> data;
+  std::vector<double> data(isize * jsize, 0.0);
   mdspan matrix(data.data(), isize, jsize);
 
   mpi::environment env;
   mpi::communicator world;
   auto elapsed = [&] {
     if (!parallel)
-      return do_sequential(matrix);
-    return do_parallel(matrix, world);
+      return do_sequential(matrix, isize, jsize);
+    return do_parallel(matrix, world, isize, jsize);
   }();
   if (world.rank() == 0) {
     // fmt::println("{}", fmt::join(data, ", "));

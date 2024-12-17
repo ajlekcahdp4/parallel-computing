@@ -40,4 +40,5 @@ function(add_exec TARGET_NAME SOURCE)
   target_link_libraries(${TARGET_NAME} OpenMP::OpenMP_CXX Boost::program_options Boost::mpi MPI::MPI_CXX fmt::fmt)
 endfunction()
 
-add_exec(parloop main.cpp)
+add_exec(parloop-mpi mpi-main.cpp)
+add_exec(parloop-omp omp-main.cpp)
